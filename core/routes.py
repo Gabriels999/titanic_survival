@@ -1,16 +1,14 @@
 from fastapi import APIRouter
 
+from model.model_svc import train_model
+
 router = APIRouter()
-
-
-@router.get("/hello/")
-async def hello_world():
-    return {"msg": "Hello World"}
 
 
 @router.get("/model-training/")
 async def model_training():
-    return {"msg": "New model accuracy: 93%"}
+    response = train_model()
+    return {**response}
 
 
 @router.get("/survival-chance-prediction/")

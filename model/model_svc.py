@@ -1,5 +1,7 @@
 import os
+from datetime import date
 
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, classification_report
@@ -8,9 +10,11 @@ from sklearn.neighbors import KNeighborsClassifier
 
 SEED = 20
 np.random.seed(SEED)
+MODEL_BASE_PATH = "model/modelo"
 
 
-def test_function():
+
+def train_model():
     file = [item for item in os.listdir() if item.endswith('.csv')][0]
 
     df = pd.read_csv(file)
@@ -30,6 +34,12 @@ def test_function():
     previsions = model.predict(contiguous_x)
 
     model_accuracy = accuracy_score(y_test, previsions)*100
+
+    # Exportar o modelo
+    if not os.path.exists(MODEL_BASE_PATH):
+        os.makedirs(MODEL_BASE_PATH)
+    joblib.dump(model, f"{MODEL_BASE_PATH}/modelo{str(date.today())}.joblib")
+
     print(classification_report(y_test, previsions))
 
     return {
