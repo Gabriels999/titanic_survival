@@ -8,18 +8,19 @@ from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
+from core.schemas import TitanicPassenger
+
 SEED = 20
 np.random.seed(SEED)
 MODEL_BASE_PATH = "model/modelo"
 
 
-
-def train_model():
+def train_model() -> dict:
     file = [item for item in os.listdir() if item.endswith('.csv')][0]
 
     df = pd.read_csv(file)
     y = df["2urvived"]
-    x = df.drop("2urvived", axis=1)
+    x = df.drop(["2urvived", "id"], axis=1)
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.27, stratify=y)
 
     # Modelo KNN
@@ -46,3 +47,16 @@ def train_model():
         "accuracy_baseline": accuracy_baseline,
         "model_accuracy": model_accuracy
         }
+
+
+def predict_passenger(passenger: TitanicPassenger) -> int:
+    arquivo = os.listdir(MODEL_BASE_PATH)[-1]
+    arquivo = os.path.join(MODEL_BASE_PATH, arquivo)
+    modelo = joblib.load(arquivo)
+
+    x = pd.DataFrame([passenger.dict()])
+    contiguous_x = np.ascontiguousarray(x)
+
+    previsions = modelo.predict(contiguous_x)
+
+    return previsions.max()

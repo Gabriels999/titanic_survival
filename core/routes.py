@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
-from model.model_svc import train_model
+from core.schemas import TitanicPassenger
+from model.model_svc import predict_passenger, train_model
 
 router = APIRouter()
 
@@ -11,6 +12,11 @@ async def model_training():
     return {**response}
 
 
-@router.get("/survival-chance-prediction/")
-async def measure_survival_probability():
-    return {"msg": "You would not survive! I'm sorry."}
+@router.post("/survival-prediction/")
+async def measure_survival_probability(request: TitanicPassenger):
+    prediction = predict_passenger(request)
+    subtitle = {
+        0: "not survive.",
+        1: "survive!"
+     }
+    return {"msg": f"You would {subtitle[prediction]}"}
